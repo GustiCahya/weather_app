@@ -9,39 +9,37 @@ class WeeklyForecast extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return ListView.builder(
-      itemCount: weeklyData.length,
-      itemBuilder: (context, index) {
-        var data = weeklyData[index];
+    return Column(
+      children: weeklyData.map((data) {
         return ListTile(
           leading: Icon(data['icon']),
           title: Text(data['day']),
           trailing: Row(
-            mainAxisSize: MainAxisSize.min,
+            mainAxisSize: MainAxisSize.min, // Important to prevent overflow
             children: <Widget>[
+              // Adjusted SliderTheme with disabled slider
               SliderTheme(
                 data: SliderTheme.of(context).copyWith(
-                  // Customize the theme for active appearance even when disabled
-                  activeTrackColor: Colors.grey, // Active part of the slider
-                  inactiveTrackColor: Colors.grey[300], // Inactive part of the slider
-                  thumbColor: Colors.grey, // Color of the slider thumb
-                  overlayColor: Colors.transparent, // Remove overlay color
-                  disabledActiveTrackColor: Colors.grey, // Use for a disabled but "active-looking" track
-                  disabledInactiveTrackColor: Colors.grey[300], // Same as above for the inactive part
-                  disabledThumbColor: Colors.grey, // Thumb color even when disabled
+                  activeTrackColor: Colors.grey,
+                  inactiveTrackColor: Colors.grey[300],
+                  thumbColor: Colors.grey,
+                  overlayColor: Colors.transparent,
+                  disabledActiveTrackColor: Colors.grey,
+                  disabledInactiveTrackColor: Colors.grey[300],
+                  disabledThumbColor: Colors.grey,
                 ),
-                child: const Slider(
-                  value: 20,
+                child: Slider(
+                  value: 20, // Assuming a static value for demonstration
                   min: 10,
                   max: 30,
                   onChanged: null, // This disables the slider
                 ),
               ),
-              Text(data['temp']),
+              Text(data['temp']), // Temperature data
             ],
           ),
         );
-      },
+      }).toList(),
     );
   }
 }

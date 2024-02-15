@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:weather_app/services/local_storage_service.dart';
+import 'package:weather_app/services/setting_storage_service.dart';
+import 'package:weather_app/main.dart';
 
 class RightDrawer extends StatefulWidget {
   @override
@@ -7,8 +8,7 @@ class RightDrawer extends StatefulWidget {
 }
 
 class _RightDrawerState extends State<RightDrawer> {
-
-  final LocalStorageService localStorageService = LocalStorageService();
+  final SettingStorageService localStorageService = SettingStorageService();
   String _selectedUnit = 'C';
   String _selectedRefreshRate = 'Setiap jam';
 
@@ -39,6 +39,9 @@ class _RightDrawerState extends State<RightDrawer> {
                 localStorageService.saveSetting('unit', 'C');
                 setState(() => _selectedUnit = 'C');
                 Navigator.pop(context);
+                Navigator.of(context).pushReplacement(
+                  MaterialPageRoute(builder: (context) => MyWeatherApp()),
+                );
               },
             ),
             ListTile(
@@ -47,6 +50,9 @@ class _RightDrawerState extends State<RightDrawer> {
                 localStorageService.saveSetting('unit', 'F');
                 setState(() => _selectedUnit = 'F');
                 Navigator.pop(context);
+                Navigator.of(context).pushReplacement(
+                  MaterialPageRoute(builder: (context) => MyWeatherApp()),
+                );
               },
             ),
           ],
@@ -67,6 +73,9 @@ class _RightDrawerState extends State<RightDrawer> {
                 localStorageService.saveSetting('refresh_rate', 'Setiap menit');
                 setState(() => _selectedRefreshRate = 'Setiap menit');
                 Navigator.pop(context);
+                Navigator.of(context).pushReplacement(
+                  MaterialPageRoute(builder: (context) => MyWeatherApp()),
+                );
               },
             ),
             ListTile(
@@ -75,6 +84,9 @@ class _RightDrawerState extends State<RightDrawer> {
                 localStorageService.saveSetting('refresh_rate', 'Setiap jam');
                 setState(() => _selectedRefreshRate = 'Setiap jam');
                 Navigator.pop(context);
+                Navigator.of(context).pushReplacement(
+                  MaterialPageRoute(builder: (context) => MyWeatherApp()),
+                );
               },
             ),
             ListTile(
@@ -83,6 +95,9 @@ class _RightDrawerState extends State<RightDrawer> {
                 localStorageService.saveSetting('refresh_rate', 'Setiap 3 jam');
                 setState(() => _selectedRefreshRate = 'Setiap 3 jam');
                 Navigator.pop(context);
+                Navigator.of(context).pushReplacement(
+                  MaterialPageRoute(builder: (context) => MyWeatherApp()),
+                );
               },
             ),
           ],

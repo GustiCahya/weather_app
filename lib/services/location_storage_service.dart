@@ -2,27 +2,43 @@ import 'package:localstorage/localstorage.dart';
 import 'dart:convert';
 
 class LocationStorageService {
-  final LocalStorage storage = LocalStorage('app_storage.json');
+  final LocalStorage storage = LocalStorage('locations2.json');
 
   void saveLocation(String title, String address, double latitude, double longitude) {
-    // Create a map to store location details
+    List<dynamic> locations = jsonDecode(storage.getItem('locations') ?? '[]');
     Map<String, dynamic> locationData = {
       'title': title,
       'address': address,
       'latitude': latitude,
       'longitude': longitude,
     };
-    // Convert map to string using jsonEncode
-    storage.setItem('location', jsonEncode(locationData));
-    print('Location saved: $title, $address, $latitude, $longitude');
+    locations.add(locationData);
+    storage.setItem('locations', jsonEncode(locations));
   }
 
-  Map<String, dynamic>? loadLocation() {
-    // Retrieve the saved location data
-    String? locationDataString = storage.getItem('location');
-    if (locationDataString != null) {
-      return jsonDecode(locationDataString);
+  List<dynamic>? loadLocations() {
+    String? locationsDataString = storage.getItem('locations');
+    if (locationsDataString != null) {
+      return jsonDecode(locationsDataString);
     }
-    return null;
+    return [];
   }
+
+  void deleteLocation(int index) {
+    List<dynamic> locations = jsonDecode(storage.getItem('locations') ?? '[]');
+    locations.removeAt(index);
+    storage.setItem('locations', jsonEncode(locations));
+  }
+
+  // Inside LocationStorageService
+  bool titleExists(String title) {
+    List<dynamic> locations = jsonDecode(storage.getItem('locations') ?? '[]');
+    for (var location in locations) {
+      if (location['title'] == title) {
+        return true;
+      }
+    }
+    return false;
+  }
+
 }

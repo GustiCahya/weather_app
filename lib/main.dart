@@ -6,6 +6,48 @@ import 'package:weather_app/components/left_drawer.dart';
 import 'package:weather_app/components/right_drawer.dart';
 import 'package:weather_app/utils/date_utils.dart';
 import 'package:weather_app/components/map_component.dart';
+import 'package:localstorage/localstorage.dart';
+import 'package:geolocator/geolocator.dart';
+import 'package:geocoding/geocoding.dart';
+import 'dart:convert';
+import 'package:weather_app/services/location_storage_service.dart';
+import 'package:weather_app/services/setting_storage_service.dart';
+
+class InitializationScreen extends StatefulWidget {
+  @override
+  _InitializationScreenState createState() => _InitializationScreenState();
+}
+
+class _InitializationScreenState extends State<InitializationScreen> {
+  final LocalStorage locationsStorage = LocalStorage('locations2.json');
+  final LocalStorage settingStorage = LocalStorage('setting_weather_app');
+
+  @override
+  void initState() {
+    super.initState();
+    _initializeStorage();
+  }
+
+  Future<void> _initializeStorage() async {
+    await Future.wait([
+      locationsStorage.ready,
+      settingStorage.ready,
+    ]);
+    Navigator.of(context).pushReplacement(
+      MaterialPageRoute(builder: (context) => WeatherHomePage()),
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    // Display a loading indicator or splash screen here if desired
+    return Scaffold(
+      body: Center(
+        child: CircularProgressIndicator(),
+      ),
+    );
+  }
+}
 
 void main() {
   runApp(MyWeatherApp());
@@ -20,12 +62,66 @@ class MyWeatherApp extends StatelessWidget {
       theme: ThemeData.light(), // Light theme
       darkTheme: ThemeData.dark(), // Dark theme
       themeMode: ThemeMode.dark, // Use dark theme
-      home: WeatherHomePage(),
+      home: InitializationScreen(),
     );
   }
 }
 
-class WeatherHomePage extends StatelessWidget {
+class WeatherHomePage extends StatefulWidget {
+  @override
+  _WeatherHomePageState createState() => _WeatherHomePageState();
+}
+
+class _WeatherHomePageState extends State<WeatherHomePage> {
+  final LocationStorageService locationStorageService = LocationStorageService();
+  final SettingStorageService settingStorageService = SettingStorageService();
+
+  @override
+  void initState() {
+    super.initState();
+    _requestLocationPermission();
+    _getCurrentLocation();
+  }
+
+  Future<void> _requestLocationPermission() async {
+    LocationPermission permission = await Geolocator.requestPermission();
+    if (permission == LocationPermission.denied) {
+      print('Location permission denied');
+    } else if (permission == LocationPermission.deniedForever) {
+      print('Location permission permanently denied');
+    }
+  }
+
+  Future<void> _getCurrentLocation() async {
+    try {
+      Position position = await Geolocator.getCurrentPosition(desiredAccuracy: LocationAccuracy.high);
+      List<Placemark> placemarks = await placemarkFromCoordinates(position.latitude, position.longitude);
+      String address = "${placemarks.first.street}, ${placemarks.first.locality}, ${placemarks.first.postalCode}, ${placemarks.first.country}";
+      String title = placemarks.first.locality ?? placemarks.first.administrativeArea ?? placemarks.first.country ?? '';
+
+      // Convert the location map to a JSON string to store in local storage.
+      String locationJson = jsonEncode({
+        'title': title,
+        'address': address,
+        'latitude': position.latitude,
+        'longitude': position.longitude,
+      });
+
+      // Save this location as the current location in settings.
+      settingStorageService.saveSetting('location', locationJson);
+      // Assuming saveLocation expects a Future to be returned, adjust if necessary.
+      if (!locationStorageService.titleExists(title)) {
+        locationStorageService.saveLocation(title, address, position.latitude, position.longitude);
+      }
+      
+      // Optionally, update the UI or show a message.
+      print("Current location saved: $title, $address");
+    } catch (e) {
+      print("Failed to get current location: $e");
+      // Handle failure when location services are disabled, permissions are denied, etc.
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -66,12 +162,18 @@ class WeatherHomePage extends StatelessWidget {
       ),
       drawer: LeftDrawer(),
       endDrawer: RightDrawer(),
-      body: Column(
-        children: <Widget>[
-          CurrentWeather(),
-          HourlyForecast(),
-          Expanded(child: WeeklyForecast()),
-        ],
+      body: RefreshIndicator(
+        onRefresh: _getCurrentLocation,
+        child: SingleChildScrollView(
+          physics: AlwaysScrollableScrollPhysics(),
+          child: Column(
+            children: <Widget>[
+              CurrentWeather(),
+              HourlyForecast(),
+              WeeklyForecast(),
+            ],
+          ),
+        ),
       ),
     );
   }

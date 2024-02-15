@@ -1,6 +1,26 @@
 import 'package:flutter/material.dart';
+import 'package:weather_app/components/map_component.dart';
+import 'package:weather_app/services/location_storage_service.dart';
+import 'package:weather_app/services/setting_storage_service.dart';
+import 'package:weather_app/main.dart';
+import 'dart:convert';
 
-class LeftDrawer extends StatelessWidget {
+class LeftDrawer extends StatefulWidget {
+  @override
+  _LeftDrawerState createState() => _LeftDrawerState();
+}
+
+class _LeftDrawerState extends State<LeftDrawer> {
+  final SettingStorageService _settingStorageService = SettingStorageService();
+  final LocationStorageService _storageService = LocationStorageService();
+  late List<dynamic> _locations;
+
+  @override
+  void initState() {
+    super.initState();
+    _locations = _storageService.loadLocations() ?? [];
+  }
+
   @override
   Widget build(BuildContext context) {
     return Drawer(
@@ -8,8 +28,9 @@ class LeftDrawer extends StatelessWidget {
         children: <Widget>[
           GestureDetector(
             onTap: () {
-              // Handle the tap event for search here
-              print('Search Tapped!');
+              Navigator.of(context).push(
+                MaterialPageRoute(builder: (context) => MapComponentPage()),
+              );
             },
             child: Container(
               padding: EdgeInsets.fromLTRB(20, 40, 20, 20), // Adjust padding for positioning
@@ -26,7 +47,7 @@ class LeftDrawer extends StatelessWidget {
                       child: Icon(Icons.search, color: Colors.grey[600]), // Darker grey icon
                     ),
                     Text(
-                      'Search Location',
+                      'Temukan Lokasi',
                       style: TextStyle(color: Colors.grey[600]), // Darker grey text
                     ),
                   ],
@@ -34,27 +55,55 @@ class LeftDrawer extends StatelessWidget {
               ),
             ),
           ),
-          ListTile(
-            leading: Icon(Icons.star),
-            title: Text('Bogor'),
-          ),
-          ListTile(
-            leading: Icon(Icons.location_city),
-            title: Text('Jakarta'),
-          ),
-          ListTile(
-            leading: Icon(Icons.location_city),
-            title: Text('Depok'),
-          ),
+          ..._locations.map((location) {
+            int index = _locations.indexOf(location);
+            return Dismissible(
+              key: Key(location['title']),
+              onDismissed: (direction) {
+                _storageService.deleteLocation(index);
+                setState(() {
+                  _locations.removeAt(index);
+                });
+              },
+              background: Container(
+                color: Colors.red,
+                alignment: Alignment.centerRight, // Align the trash icon to the right
+                padding: EdgeInsets.only(right: 20.0), // Add some padding to the right
+                child: Icon(Icons.delete, color: Colors.white), // Trash icon with white color
+              ),
+              child: ListTile(
+                leading: Icon(Icons.location_city),
+                title: Text(location['title']),
+                subtitle: Text(location['address']),
+                onTap: () {
+                  // Convert the location map to a JSON string to store in local storage.
+                  String locationJson = jsonEncode({
+                    'title': location['title'],
+                    'address': location['address'],
+                    'latitude': location['latitude'],
+                    'longitude': location['longitude'],
+                  });
+
+                  // Save this location as the current location in settings.
+                  _settingStorageService.saveSetting('location', locationJson);
+
+                  Navigator.of(context).pushReplacement(
+                    MaterialPageRoute(builder: (context) => MyWeatherApp()),
+                  );
+                },
+              ),
+            );
+          }).toList(),
           Divider(),
           ListTile(
             leading: Icon(Icons.add),
             title: Text('Tambah lokasi'),
-          ),
-          ListTile(
-            leading: Icon(Icons.settings),
-            title: Text('Atur lokasi tersimpan'),
-          ),
+            onTap: () {
+              Navigator.of(context).push(
+                MaterialPageRoute(builder: (context) => MapComponentPage()),
+              );
+            },
+          )
         ],
       ),
     );

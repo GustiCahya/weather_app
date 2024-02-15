@@ -1,7 +1,15 @@
-- finishing save map then put it into local storage
-- implement map component to icon, search, tambah, atur
-- location permission and put the location to map component
-- display selected location to left drawer
-- finish endpoint homepage
-- set C and F in homepage
+- finishing save map then put it into local storage V
+- implement map component to icon, search, tambah, atur V
+- location permission and put the location to map component V
+- display selected location to left drawer V
+- finish endpoint homepage V
+- set C and F in homepage V
+- finish hourly and weekly endpoint
+- finish hourly and weekly C or F decision 
 - set auto refresh timer based on local storage in service api
+
+
+key of setting storage
+- location
+- unit
+- refresh_rate
