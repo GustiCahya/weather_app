@@ -4,6 +4,8 @@ import 'package:weather_app/components/hourly_forecast.dart';
 import 'package:weather_app/components/weekly_forecast.dart';
 import 'package:weather_app/components/left_drawer.dart';
 import 'package:weather_app/components/right_drawer.dart';
+import 'package:weather_app/utils/date_utils.dart';
+import 'package:weather_app/components/map_component.dart';
 
 void main() {
   runApp(MyWeatherApp());
@@ -39,11 +41,15 @@ class WeatherHomePage extends StatelessWidget {
             );
           },
         ),
-        title: Text('Minggu, 23 July'),
+        title: Text(formatDate()),
         actions: [
           IconButton(
             icon: Icon(Icons.map),
-            onPressed: () {},
+            onPressed: () {
+              Navigator.of(context).push(
+                MaterialPageRoute(builder: (context) => MapComponentPage()),
+              );
+            },
           ),
           Builder(
             builder: (BuildContext context) {
