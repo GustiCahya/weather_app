@@ -4,12 +4,34 @@ class LeftDrawer extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Drawer(
-      child: Column(
+      child: ListView( // Using ListView for better scrolling behavior
         children: <Widget>[
-          DrawerHeader(
-            child: Text('Search Location'),
-            decoration: BoxDecoration(
-              color: Colors.blue,
+          GestureDetector(
+            onTap: () {
+              // Handle the tap event for search here
+              print('Search Tapped!');
+            },
+            child: Container(
+              padding: EdgeInsets.fromLTRB(20, 40, 20, 20), // Adjust padding for positioning
+              child: Container(
+                height: 48, // Standard height for text fields
+                decoration: BoxDecoration(
+                  color: Colors.grey[200], // Light grey color for the input field
+                  borderRadius: BorderRadius.circular(24), // Rounded corners
+                ),
+                child: Row(
+                  children: <Widget>[
+                    Padding(
+                      padding: EdgeInsets.symmetric(horizontal: 16),
+                      child: Icon(Icons.search, color: Colors.grey[600]), // Darker grey icon
+                    ),
+                    Text(
+                      'Search Location',
+                      style: TextStyle(color: Colors.grey[600]), // Darker grey text
+                    ),
+                  ],
+                ),
+              ),
             ),
           ),
           ListTile(

@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 class HourlyForecast extends StatelessWidget {
   // Dummy data for hourly forecast
   final List<Map<String, dynamic>> hourlyData = [
-    {'time': '13:30', 'temp': '19°', 'icon': Icons.wb_sunny},
+    {'time': '13:30', 'temp': '29.23°', 'icon': Icons.wb_cloudy},
     // Add more entries here...
   ];
 

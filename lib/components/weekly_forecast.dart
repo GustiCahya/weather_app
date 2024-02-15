@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 class WeeklyForecast extends StatelessWidget {
   // Dummy data for weekly forecast
   final List<Map<String, dynamic>> weeklyData = [
-    {'day': 'Hari ini', 'temp': '24°', 'icon': Icons.wb_sunny},
+    {'day': 'Hari ini', 'temp': '29.23°', 'icon': Icons.wb_sunny},
     // Add more entries here...
   ];
 
@@ -21,18 +21,20 @@ class WeeklyForecast extends StatelessWidget {
             children: <Widget>[
               SliderTheme(
                 data: SliderTheme.of(context).copyWith(
+                  // Customize the theme for active appearance even when disabled
                   activeTrackColor: Colors.grey, // Active part of the slider
                   inactiveTrackColor: Colors.grey[300], // Inactive part of the slider
                   thumbColor: Colors.grey, // Color of the slider thumb
-                  overlayColor: Colors.grey.withAlpha(32), // Color of the halo effect
-                  thumbShape: const RoundSliderThumbShape(enabledThumbRadius: 12.0), // Thumb shape and size
-                  overlayShape: const RoundSliderOverlayShape(overlayRadius: 28.0), // Halo shape and size
+                  overlayColor: Colors.transparent, // Remove overlay color
+                  disabledActiveTrackColor: Colors.grey, // Use for a disabled but "active-looking" track
+                  disabledInactiveTrackColor: Colors.grey[300], // Same as above for the inactive part
+                  disabledThumbColor: Colors.grey, // Thumb color even when disabled
                 ),
-                child: Slider(
+                child: const Slider(
                   value: 20,
                   min: 10,
                   max: 30,
-                  onChanged: (newRating) {},
+                  onChanged: null, // This disables the slider
                 ),
               ),
               Text(data['temp']),
