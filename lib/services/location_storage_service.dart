@@ -4,7 +4,9 @@ import 'dart:convert';
 class LocationStorageService {
   final LocalStorage storage = LocalStorage('locations2.json');
 
-  void saveLocation(String title, String address, double latitude, double longitude) {
+  void saveLocation(
+      String title, String address, double latitude, double longitude) async {
+    await storage.ready; // Ensure storage is ready
     List<dynamic> locations = jsonDecode(storage.getItem('locations') ?? '[]');
     Map<String, dynamic> locationData = {
       'title': title,
@@ -13,6 +15,12 @@ class LocationStorageService {
       'longitude': longitude,
     };
     locations.add(locationData);
+
+    // Check if locations list exceeds 7 entries, if so, remove the first one
+    if (locations.length > 7) {
+      locations.removeAt(0);
+    }
+
     storage.setItem('locations', jsonEncode(locations));
   }
 
@@ -40,5 +48,4 @@ class LocationStorageService {
     }
     return false;
   }
-
 }

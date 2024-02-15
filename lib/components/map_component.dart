@@ -129,6 +129,9 @@ class _MapComponentState extends State<MapComponent> {
                           content: Text(
                               "Nama lokasi ini sudah pernah ditambahkan sebelumnya")),
                     );
+                    Navigator.of(context).pushReplacement(
+                      MaterialPageRoute(builder: (context) => MyWeatherApp()),
+                    );
                   }
                 },
               ),

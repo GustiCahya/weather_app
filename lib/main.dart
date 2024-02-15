@@ -108,7 +108,9 @@ class _WeatherHomePageState extends State<WeatherHomePage> {
       });
 
       // Save this location as the current location in settings.
-      settingStorageService.saveSetting('location', locationJson);
+      if (settingStorageService.getSavedLocation() == null) {
+        settingStorageService.saveSetting('location', locationJson);
+      }
       // Assuming saveLocation expects a Future to be returned, adjust if necessary.
       if (!locationStorageService.titleExists(title)) {
         locationStorageService.saveLocation(title, address, position.latitude, position.longitude);
