@@ -37,14 +37,14 @@ class _LeftDrawerState extends State<LeftDrawer> {
               child: Container(
                 height: 48, // Standard height for text fields
                 decoration: BoxDecoration(
-                  color: Colors.grey[200], // Light grey color for the input field
+                  color: Colors.green[100], // Light grey color for the input field
                   borderRadius: BorderRadius.circular(24), // Rounded corners
                 ),
                 child: Row(
                   children: <Widget>[
                     Padding(
                       padding: EdgeInsets.symmetric(horizontal: 16),
-                      child: Icon(Icons.search, color: Colors.grey[600]), // Darker grey icon
+                      child: Icon(Icons.map, color: Colors.grey[600]), // Darker grey icon
                     ),
                     Text(
                       'Temukan Lokasi',
