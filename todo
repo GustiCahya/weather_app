@@ -1,0 +1,7 @@
+- finishing save map then put it into local storage
+- implement map component to icon, search, tambah, atur
+- location permission and put the location to map component
+- display selected location to left drawer
+- finish endpoint homepage
+- set C and F in homepage
+- set auto refresh timer based on local storage in service api
