@@ -4,9 +4,9 @@
 - display selected location to left drawer V
 - finish endpoint homepage V
 - set C and F in homepage V
-- finish hourly and weekly endpoint
-- finish hourly and weekly C or F decision 
-- set auto refresh timer based on local storage in service api
+- finish hourly and weekly endpoint V
+- finish hourly and weekly C or F decision V
+- set auto refresh timer based on local storage in service api V
 
 
 key of setting storage

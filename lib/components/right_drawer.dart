@@ -68,17 +68,6 @@ class _RightDrawerState extends State<RightDrawer> {
         return ListView(
           children: <Widget>[
             ListTile(
-              title: Text('Setiap menit'),
-              onTap: () {
-                localStorageService.saveSetting('refresh_rate', 'Setiap menit');
-                setState(() => _selectedRefreshRate = 'Setiap menit');
-                Navigator.pop(context);
-                Navigator.of(context).pushReplacement(
-                  MaterialPageRoute(builder: (context) => MyWeatherApp()),
-                );
-              },
-            ),
-            ListTile(
               title: Text('Setiap jam'),
               onTap: () {
                 localStorageService.saveSetting('refresh_rate', 'Setiap jam');
@@ -94,6 +83,17 @@ class _RightDrawerState extends State<RightDrawer> {
               onTap: () {
                 localStorageService.saveSetting('refresh_rate', 'Setiap 3 jam');
                 setState(() => _selectedRefreshRate = 'Setiap 3 jam');
+                Navigator.pop(context);
+                Navigator.of(context).pushReplacement(
+                  MaterialPageRoute(builder: (context) => MyWeatherApp()),
+                );
+              },
+            ),
+            ListTile(
+              title: Text('Setiap 6 jam'),
+              onTap: () {
+                localStorageService.saveSetting('refresh_rate', 'Setiap 6 jam');
+                setState(() => _selectedRefreshRate = 'Setiap 6 jam');
                 Navigator.pop(context);
                 Navigator.of(context).pushReplacement(
                   MaterialPageRoute(builder: (context) => MyWeatherApp()),

@@ -15,4 +15,26 @@ class ApiService {
       throw Exception('Failed to load weather data');
     }
   }
+  Future<Map<String, dynamic>> fetchHourlyWeather({required double lat, required double lon}) async {
+    final uri = Uri.parse('$url/v1/weather/hourly?lat=$lat&lon=$lon');
+    print(uri);
+    final response = await http.get(uri);
+
+    if (response.statusCode == 200) {
+      return json.decode(response.body);
+    } else {
+      throw Exception('Failed to load weather data');
+    }
+  }
+  Future<Map<String, dynamic>> fetchDailyWeather({required double lat, required double lon}) async {
+    final uri = Uri.parse('$url/v1/weather/daily?lat=$lat&lon=$lon');
+    print(uri);
+    final response = await http.get(uri);
+
+    if (response.statusCode == 200) {
+      return json.decode(response.body);
+    } else {
+      throw Exception('Failed to load weather data');
+    }
+  }
 }

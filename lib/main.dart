@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:weather_app/components/current_weather.dart';
 import 'package:weather_app/components/hourly_forecast.dart';
-import 'package:weather_app/components/weekly_forecast.dart';
+import 'package:weather_app/components/daily_forecast.dart';
 import 'package:weather_app/components/left_drawer.dart';
 import 'package:weather_app/components/right_drawer.dart';
 import 'package:weather_app/utils/date_utils.dart';
@@ -10,6 +10,7 @@ import 'package:localstorage/localstorage.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:geocoding/geocoding.dart';
 import 'dart:convert';
+import 'dart:async';
 import 'package:weather_app/services/location_storage_service.dart';
 import 'package:weather_app/services/setting_storage_service.dart';
 
@@ -73,14 +74,23 @@ class WeatherHomePage extends StatefulWidget {
 }
 
 class _WeatherHomePageState extends State<WeatherHomePage> {
-  final LocationStorageService locationStorageService = LocationStorageService();
+  final LocationStorageService locationStorageService =
+      LocationStorageService();
   final SettingStorageService settingStorageService = SettingStorageService();
+  Timer? _refreshTimer;
 
   @override
   void initState() {
     super.initState();
     _requestLocationPermission();
     _getCurrentLocation();
+    _setupRefreshTimer();
+  }
+
+  @override
+  void dispose() {
+    _refreshTimer?.cancel(); // Cancel the timer when the widget is disposed
+    super.dispose();
   }
 
   Future<void> _requestLocationPermission() async {
@@ -94,10 +104,16 @@ class _WeatherHomePageState extends State<WeatherHomePage> {
 
   Future<void> _getCurrentLocation() async {
     try {
-      Position position = await Geolocator.getCurrentPosition(desiredAccuracy: LocationAccuracy.high);
-      List<Placemark> placemarks = await placemarkFromCoordinates(position.latitude, position.longitude);
-      String address = "${placemarks.first.street}, ${placemarks.first.locality}, ${placemarks.first.postalCode}, ${placemarks.first.country}";
-      String title = placemarks.first.locality ?? placemarks.first.administrativeArea ?? placemarks.first.country ?? '';
+      Position position = await Geolocator.getCurrentPosition(
+          desiredAccuracy: LocationAccuracy.high);
+      List<Placemark> placemarks =
+          await placemarkFromCoordinates(position.latitude, position.longitude);
+      String address =
+          "${placemarks.first.street}, ${placemarks.first.locality}, ${placemarks.first.postalCode}, ${placemarks.first.country}";
+      String title = placemarks.first.locality ??
+          placemarks.first.administrativeArea ??
+          placemarks.first.country ??
+          '';
 
       // Convert the location map to a JSON string to store in local storage.
       String locationJson = jsonEncode({
@@ -113,15 +129,39 @@ class _WeatherHomePageState extends State<WeatherHomePage> {
       }
       // Assuming saveLocation expects a Future to be returned, adjust if necessary.
       if (!locationStorageService.titleExists(title)) {
-        locationStorageService.saveLocation(title, address, position.latitude, position.longitude);
+        locationStorageService.saveLocation(
+            title, address, position.latitude, position.longitude);
       }
-      
+
       // Optionally, update the UI or show a message.
       print("Current location saved: $title, $address");
     } catch (e) {
       print("Failed to get current location: $e");
       // Handle failure when location services are disabled, permissions are denied, etc.
     }
+  }
+
+  Future<void> _setupRefreshTimer() async {
+    await settingStorageService.storage.ready; // Ensure storage is ready
+    String? refreshRate = settingStorageService.getSetting('refresh_rate');
+    
+    Duration duration = const Duration(hours: 1); // Default to 1 hour if setting is not found or recognized
+
+    if (refreshRate == 'Setiap jam') {
+      duration = const Duration(hours: 1);
+    } else if (refreshRate == 'Setiap 3 jam') {
+      duration = const Duration(hours: 3);
+    } else if (refreshRate == 'Setiap 6 jam') {
+      duration = const Duration(hours: 6);
+    }
+
+    _refreshTimer = Timer.periodic(duration, (Timer t) => _refreshContent());
+  }
+
+  void _refreshContent() {
+    Navigator.of(context).pushReplacement(
+      MaterialPageRoute(builder: (context) => MyWeatherApp()),
+    );
   }
 
   @override
@@ -165,14 +205,16 @@ class _WeatherHomePageState extends State<WeatherHomePage> {
       drawer: LeftDrawer(),
       endDrawer: RightDrawer(),
       body: RefreshIndicator(
-        onRefresh: _getCurrentLocation,
+        onRefresh: () async {
+          _refreshContent();
+        },
         child: SingleChildScrollView(
           physics: AlwaysScrollableScrollPhysics(),
           child: Column(
             children: <Widget>[
               CurrentWeather(),
               HourlyForecast(),
-              WeeklyForecast(),
+              DailyForecast(),
             ],
           ),
         ),
